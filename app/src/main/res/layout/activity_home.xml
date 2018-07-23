@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activitys.HomeActivity">
+
+
+    <include
+        android:id="@+id/title_bar"
+        layout="@layout/common_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/play_rtmp00"
+        layout="@layout/item_play_rtmp"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_bar" />
+
+    <include
+        android:id="@+id/play_rtmp01"
+        layout="@layout/item_play_rtmp"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/play_rtmp00" />
+
+
+
+    <com.microsys.imbcloudlive.widget.RecyclerTabLayout
+        android:id="@+id/home_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:background="#eeecea"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/play_rtmp01"
+        app:rtl_tabIndicatorHeight="0dp"
+        app:rtl_tabMaxWidth="100dp"
+        app:rtl_tabMinWidth="100dp" />
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/home_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_indicator" />
+
+</android.support.constraint.ConstraintLayout>
