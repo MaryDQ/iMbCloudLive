@@ -60,17 +60,17 @@ public class RecyclerTabLayout extends RecyclerView {
     protected LinearLayoutManager mLinearLayoutManager;
     protected RecyclerOnScrollListener mRecyclerOnScrollListener;
     protected ViewPager mViewPager;
-    protected Adapter<?> mAdapter;
+    protected AbstractAdapter<?> mAdapter;
 
     protected int mIndicatorPosition;
     protected int mIndicatorGap;
     protected int mIndicatorScroll;
-    private int mOldPosition;
-    private int mOldScrollOffset;
     protected float mOldPositionOffset;
     protected float mPositionThreshold;
     protected boolean mRequestScrollToTab;
     protected boolean mScrollEanbled;
+    private int mOldPosition;
+    private int mOldScrollOffset;
 
     public RecyclerTabLayout(Context context) {
         this(context, null);
@@ -140,6 +140,14 @@ public class RecyclerTabLayout extends RecyclerView {
         a.recycle();
     }
 
+    public void setIndicatorColor(int color) {
+        mIndicatorPaint.setColor(color);
+    }
+
+    public void setIndicatorHeight(int indicatorHeight) {
+        mIndicatorHeight = indicatorHeight;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         if (mRecyclerOnScrollListener != null) {
@@ -149,13 +157,36 @@ public class RecyclerTabLayout extends RecyclerView {
         super.onDetachedFromWindow();
     }
 
+    @Override
+    public void onDraw(Canvas canvas) {
+        View view = mLinearLayoutManager.findViewByPosition(mIndicatorPosition);
+        if (view == null) {
+            if (mRequestScrollToTab) {
+                mRequestScrollToTab = false;
+                scrollToTab(mViewPager.getCurrentItem());
+            }
+            return;
+        }
+        mRequestScrollToTab = false;
 
-    public void setIndicatorColor(int color) {
-        mIndicatorPaint.setColor(color);
+        int left;
+        int right;
+        if (isLayoutRtl()) {
+            left = view.getLeft() - mIndicatorScroll - mIndicatorGap;
+            right = view.getRight() - mIndicatorScroll + mIndicatorGap;
+        } else {
+            left = view.getLeft() + mIndicatorScroll - mIndicatorGap;
+            right = view.getRight() + mIndicatorScroll + mIndicatorGap;
+        }
+
+        int top = getHeight() - mIndicatorHeight;
+        int bottom = getHeight();
+
+        canvas.drawRect(left, top, right, bottom, mIndicatorPaint);
     }
 
-    public void setIndicatorHeight(int indicatorHeight) {
-        mIndicatorHeight = indicatorHeight;
+    protected boolean isLayoutRtl() {
+        return ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
 
     public void setAutoSelectionMode(boolean autoSelect) {
@@ -185,7 +216,7 @@ public class RecyclerTabLayout extends RecyclerView {
         setUpWithAdapter(adapter);
     }
 
-    public void setUpWithAdapter(RecyclerTabLayout.Adapter<?> adapter) {
+    public void setUpWithAdapter(AbstractAdapter<?> adapter) {
         mAdapter = adapter;
         mViewPager = adapter.getViewPager();
         if (mViewPager.getAdapter() == null) {
@@ -194,48 +225,6 @@ public class RecyclerTabLayout extends RecyclerView {
         mViewPager.addOnPageChangeListener(new ViewPagerOnPageChangeListener(this));
         setAdapter(adapter);
         scrollToTab(mViewPager.getCurrentItem());
-    }
-
-    public void setCurrentItem(int position, boolean smoothScroll) {
-        if (mViewPager != null) {
-            mViewPager.setCurrentItem(position, smoothScroll);
-            scrollToTab(mViewPager.getCurrentItem());
-            return;
-        }
-
-        if (smoothScroll && position != mIndicatorPosition) {
-            startAnimation(position);
-
-        } else {
-            scrollToTab(position);
-        }
-    }
-
-    protected void startAnimation(final int position) {
-
-        float distance = 1;
-
-        View view = mLinearLayoutManager.findViewByPosition(position);
-        if (view != null) {
-            float currentX = view.getX() + view.getMeasuredWidth() / 2.f;
-            float centerX = getMeasuredWidth() / 2.f;
-            distance = Math.abs(centerX - currentX) / view.getMeasuredWidth();
-        }
-
-        ValueAnimator animator;
-        if (position < mIndicatorPosition) {
-            animator = ValueAnimator.ofFloat(distance, 0);
-        } else {
-            animator = ValueAnimator.ofFloat(-distance, 0);
-        }
-        animator.setDuration(DEFAULT_SCROLL_DURATION);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                scrollToTab(position, (float) animation.getAnimatedValue(), true);
-            }
-        });
-        animator.start();
     }
 
     protected void scrollToTab(int position) {
@@ -264,7 +253,7 @@ public class RecyclerTabLayout extends RecyclerView {
                 if (position == 0) {
                     float indicatorGap = (nextView.getMeasuredWidth() - selectedView.getMeasuredWidth()) / 2;
                     mIndicatorGap = (int) (indicatorGap * positionOffset);
-                    mIndicatorScroll = (int)((selectedView.getMeasuredWidth() + indicatorGap)  * positionOffset);
+                    mIndicatorScroll = (int) ((selectedView.getMeasuredWidth() + indicatorGap) * positionOffset);
 
                 } else {
                     float indicatorGap = (nextView.getMeasuredWidth() - selectedView.getMeasuredWidth()) / 2;
@@ -326,40 +315,51 @@ public class RecyclerTabLayout extends RecyclerView {
         }
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        View view = mLinearLayoutManager.findViewByPosition(mIndicatorPosition);
-        if (view == null) {
-            if (mRequestScrollToTab) {
-                mRequestScrollToTab = false;
-                scrollToTab(mViewPager.getCurrentItem());
-            }
+    public void setCurrentItem(int position, boolean smoothScroll) {
+        if (mViewPager != null) {
+            mViewPager.setCurrentItem(position, smoothScroll);
+            scrollToTab(mViewPager.getCurrentItem());
             return;
         }
-        mRequestScrollToTab = false;
 
-        int left;
-        int right;
-        if (isLayoutRtl()) {
-            left = view.getLeft() - mIndicatorScroll - mIndicatorGap;
-            right = view.getRight() - mIndicatorScroll + mIndicatorGap;
+        if (smoothScroll && position != mIndicatorPosition) {
+            startAnimation(position);
+
         } else {
-            left = view.getLeft() + mIndicatorScroll - mIndicatorGap;
-            right = view.getRight() + mIndicatorScroll + mIndicatorGap;
+            scrollToTab(position);
         }
-
-        int top = getHeight() - mIndicatorHeight;
-        int bottom = getHeight();
-
-        canvas.drawRect(left, top, right, bottom, mIndicatorPaint);
     }
 
-    protected boolean isLayoutRtl() {
-        return ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL;
+    protected void startAnimation(final int position) {
+
+        float distance = 1;
+
+        View view = mLinearLayoutManager.findViewByPosition(position);
+        if (view != null) {
+            float currentX = view.getX() + view.getMeasuredWidth() / 2.f;
+            float centerX = getMeasuredWidth() / 2.f;
+            distance = Math.abs(centerX - currentX) / view.getMeasuredWidth();
+        }
+
+        ValueAnimator animator;
+        if (position < mIndicatorPosition) {
+            animator = ValueAnimator.ofFloat(distance, 0);
+        } else {
+            animator = ValueAnimator.ofFloat(-distance, 0);
+        }
+        animator.setDuration(DEFAULT_SCROLL_DURATION);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                scrollToTab(position, (float) animation.getAnimatedValue(), true);
+            }
+        });
+        animator.start();
     }
 
     protected static class RecyclerOnScrollListener extends OnScrollListener {
 
+        public int mDx;
         protected RecyclerTabLayout mRecyclerTabLayout;
         protected LinearLayoutManager mLinearLayoutManager;
 
@@ -367,13 +367,6 @@ public class RecyclerTabLayout extends RecyclerView {
                                         LinearLayoutManager linearLayoutManager) {
             mRecyclerTabLayout = recyclerTabLayout;
             mLinearLayoutManager = linearLayoutManager;
-        }
-
-        public int mDx;
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            mDx += dx;
         }
 
         @Override
@@ -389,7 +382,14 @@ public class RecyclerTabLayout extends RecyclerView {
                     break;
                 case SCROLL_STATE_DRAGGING:
                 case SCROLL_STATE_SETTLING:
+                default:
+                    break;
             }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            mDx += dx;
         }
 
         protected void selectCenterTabForRightScroll() {
@@ -434,11 +434,6 @@ public class RecyclerTabLayout extends RecyclerView {
         }
 
         @Override
-        public void onPageScrollStateChanged(int state) {
-            mScrollState = state;
-        }
-
-        @Override
         public void onPageSelected(int position) {
             if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 if (mRecyclerTabLayout.mIndicatorPosition != position) {
@@ -446,15 +441,20 @@ public class RecyclerTabLayout extends RecyclerView {
                 }
             }
         }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            mScrollState = state;
+        }
     }
 
-    public static abstract class Adapter<T extends RecyclerView.ViewHolder>
+    public static abstract class AbstractAdapter<T extends RecyclerView.ViewHolder>
             extends RecyclerView.Adapter<T> {
 
         protected ViewPager mViewPager;
         protected int mIndicatorPosition;
 
-        public Adapter(ViewPager viewPager) {
+        public AbstractAdapter(ViewPager viewPager) {
             mViewPager = viewPager;
         }
 
@@ -462,17 +462,17 @@ public class RecyclerTabLayout extends RecyclerView {
             return mViewPager;
         }
 
-        public void setCurrentIndicatorPosition(int indicatorPosition) {
-            mIndicatorPosition = indicatorPosition;
-        }
-
         public int getCurrentIndicatorPosition() {
             return mIndicatorPosition;
+        }
+
+        public void setCurrentIndicatorPosition(int indicatorPosition) {
+            mIndicatorPosition = indicatorPosition;
         }
     }
 
     public static class DefaultAdapter
-            extends RecyclerTabLayout.Adapter<DefaultAdapter.ViewHolder> {
+            extends AbstractAdapter<DefaultAdapter.ViewHolder> {
 
         protected static final int MAX_TAB_TEXT_LINES = 2;
 
@@ -546,6 +546,11 @@ public class RecyclerTabLayout extends RecyclerView {
             return getViewPager().getAdapter().getCount();
         }
 
+        protected RecyclerView.LayoutParams createLayoutParamsForTabs() {
+            return new RecyclerView.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+        }
+
         public void setTabPadding(int tabPaddingStart, int tabPaddingTop, int tabPaddingEnd,
                                   int tabPaddingBottom) {
             mTabPaddingStart = tabPaddingStart;
@@ -578,11 +583,6 @@ public class RecyclerTabLayout extends RecyclerView {
 
         public void setTabOnScreenLimit(int tabOnScreenLimit) {
             mTabOnScreenLimit = tabOnScreenLimit;
-        }
-
-        protected RecyclerView.LayoutParams createLayoutParamsForTabs() {
-            return new RecyclerView.LayoutParams(
-                    LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {

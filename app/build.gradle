@@ -72,4 +72,8 @@ dependencies {
 
     //java线程池相关包
     implementation files('libs/com.google.guava_1.6.0.jar')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'

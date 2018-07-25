@@ -4,18 +4,18 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/9/27.
  */
-public abstract class MultiTypeAdapter extends RecyclerView.Adapter<ViewHolder> {
+public abstract class AbstractMultiTypeAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     protected String TAG;
     protected Context mContext;
-    protected ArrayList mDatas;
+    protected List mDatas;
 
-    public MultiTypeAdapter(Context mContext, ArrayList mDatas) {
+    public AbstractMultiTypeAdapter(Context mContext, List mDatas) {
         this.mContext = mContext;
         this.mDatas = mDatas;
         this.TAG = getClass().getSimpleName();

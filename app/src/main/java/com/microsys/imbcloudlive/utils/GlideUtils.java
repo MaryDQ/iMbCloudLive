@@ -130,13 +130,13 @@ public class GlideUtils {
     }
 
     //清理磁盘缓存
-    public static void GuideClearDiskCache(Context mContext) {
+    public static void guideClearDiskCache(Context mContext) {
         //理磁盘缓存 需要在子线程中执行
         Glide.get(mContext).clearDiskCache();
     }
 
     //清理内存缓存
-    public static void GuideClearMemory(Context mContext) {
+    public static void guideClearMemory(Context mContext) {
         //清理内存缓存  可以在UI主线程中进行
         Glide.get(mContext).clearMemory();
     }

@@ -10,13 +10,13 @@ package com.microsys.imbcloudlive.base;
  */
 
 public interface RequestPermissionCallback {
-    void GrantedPermission();
+    void grantedPermission();
     void dentedPermission();
 
     //空实现
     RequestPermissionCallback EMPTY = new RequestPermissionCallback() {
         @Override
-        public void GrantedPermission() {
+        public void grantedPermission() {
             //不做事
         }
 

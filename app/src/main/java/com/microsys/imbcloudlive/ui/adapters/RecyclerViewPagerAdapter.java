@@ -28,9 +28,10 @@ public class RecyclerViewPagerAdapter extends FragmentPagerAdapter {
     }
 
 
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-//        container.removeView((View) object);
+//        super.destroyItem(container,position,object);
     }
 
     @Override

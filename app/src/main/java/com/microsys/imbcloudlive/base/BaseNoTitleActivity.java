@@ -102,10 +102,10 @@ public abstract class BaseNoTitleActivity<P extends IPresenter> extends AppCompa
             if (readPhoneState != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(new String[]{permission}, requestCode);
             } else {
-                requestPermissionCallback.GrantedPermission();
+                requestPermissionCallback.grantedPermission();
             }
         } else {
-            requestPermissionCallback.GrantedPermission();
+            requestPermissionCallback.grantedPermission();
         }
     }
 
@@ -114,7 +114,7 @@ public abstract class BaseNoTitleActivity<P extends IPresenter> extends AppCompa
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             RequestPermissionCallback callback = requestPermissionCallbackMap.get(requestCode);
-            callback.GrantedPermission();
+            callback.grantedPermission();
         } else {
             RequestPermissionCallback disCallback = requestPermissionCallbackMap.get(requestCode);
             disCallback.dentedPermission();

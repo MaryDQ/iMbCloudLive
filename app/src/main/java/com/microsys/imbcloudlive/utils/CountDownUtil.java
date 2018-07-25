@@ -74,6 +74,8 @@ public class CountDownUtil {
                         setUsable(true);
                     }
                     break;
+                default:
+                    break;
             }
         }
     };
@@ -133,18 +135,9 @@ public class CountDownUtil {
         return this;
     }
 
-    /**
-     * 开始倒计时
-     */
-    public CountDownUtil start() {
-        mLastMillis = mCountDownMillis;
-        mHandler.sendEmptyMessage(MSG_WHAT_START);
-        return this;
-    }
-
     public CountDownUtil setOnClickListener(@Nullable final View.OnClickListener onClickListener) {
         TextView mTextView = mWeakReference.get();
-        if (mTextView != null)
+        if (mTextView != null) {
             mTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,6 +146,16 @@ public class CountDownUtil {
                     onClickListener.onClick(v);
                 }
             });
+        }
+        return this;
+    }
+
+    /**
+     * 开始倒计时
+     */
+    public CountDownUtil start() {
+        mLastMillis = mCountDownMillis;
+        mHandler.sendEmptyMessage(MSG_WHAT_START);
         return this;
     }
 

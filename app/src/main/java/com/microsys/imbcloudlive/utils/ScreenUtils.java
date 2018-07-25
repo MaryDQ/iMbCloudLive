@@ -7,8 +7,8 @@ import com.microsys.imbcloudlive.app.MyApplication;
 
 public class ScreenUtils {
     private static volatile ScreenUtils mScreenUtils;
-    private int ScreenWidth;
-    private int ScreenHeight;
+    private int screenWidth;
+    private int screenHeight;
     private float xdpi, ydpi;
 
     public ScreenUtils() {
@@ -27,18 +27,18 @@ public class ScreenUtils {
 
     public void init() {
         DisplayMetrics dm = MyApplication.getInstance().getResources().getDisplayMetrics();
-        ScreenWidth = dm.widthPixels;
-        ScreenHeight = dm.heightPixels;
+        screenWidth = dm.widthPixels;
+        screenHeight = dm.heightPixels;
         xdpi = dm.xdpi;
         ydpi = dm.ydpi;
     }
 
     public int getScreenWidth() {
-        return ScreenWidth;
+        return screenWidth;
     }
 
     public int getSceenHeight() {
-        return ScreenHeight;
+        return screenHeight;
     }
 
     public float getXdpi() {

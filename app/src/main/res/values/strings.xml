@@ -4,4 +4,11 @@
     <string name="switch_video">切换</string>
     <string name="play_video">播出</string>
     <string name="pre_view">预览画面</string>
+    <string name="clickToAddAndLongClickToEdit">轻点添加,长按编辑</string>
+    <string name="clickToAdd">点击添加</string>
+    <string name="integerValueOne">1</string>
+    <string name="deviceNotSupport">受限于您的设备性能，无法使用更多视频源</string>
+    <string name="newSth">新建</string>
+    <string name="clickToInput">添加输入</string>
+    <string name="clickToAddInputStreaming">点击添加输入源:0</string>
 </resources>

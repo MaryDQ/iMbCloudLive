@@ -21,7 +21,7 @@ import java.util.List;
  * 创建时间： 2018/7/23
  */
 public class RecyclerTabLyoutAdapter
-        extends RecyclerTabLayout.Adapter<RecyclerTabLyoutAdapter.ViewHolder> {
+        extends RecyclerTabLayout.AbstractAdapter<RecyclerTabLyoutAdapter.ViewHolder> {
 
     private RecyclerViewPagerAdapter mAdapater;
     private List<String> mList;
@@ -50,6 +50,7 @@ public class RecyclerTabLyoutAdapter
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
             holder.textView.setTextColor(Color.WHITE);
         }
+
     }
 
 

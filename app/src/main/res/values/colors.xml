@@ -5,4 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="title_bar_bg">#000</color>
     <color name="white">#fff</color>
+    <color name="transparent">#00000000</color>//透明色
+    <color name="fontBrown">#635e58</color>
+    <color name="dialogButtonColor">#45c2fa</color>
+    <color name="dialogLineColor">#d5d5d5</color>
 </resources>
