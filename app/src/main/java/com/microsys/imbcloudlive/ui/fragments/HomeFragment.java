@@ -84,6 +84,7 @@ public class HomeFragment extends BaseFragment {
     private TXLivePlayer mLivePlayer = null;
     private TXLivePlayConfig mPlayConfig;
 
+
     private void initAdapter() {
         mLivePlayer=new TXLivePlayer(mContext);
         mPlayConfig = new TXLivePlayConfig();

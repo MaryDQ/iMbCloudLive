@@ -38,6 +38,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation(name: 'LiteAVSDK_Smart', ext: 'aar')
+
     implementation(name: 'liteimsdk-release', ext: 'aar')
 
     //分割jar包
