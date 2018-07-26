@@ -35,14 +35,14 @@ public abstract class AbstractSimpleAdapter<T> extends AbstractMultiTypeAdapter 
     }
 
     @Override
-    protected void onBindViewHolder(final ViewHolder holder, int type, Object data) {
-        onBindViewHolder(holder, (T)data);
+    protected void onBindViewHolder(final ViewHolder holder, int type, Object data,int position) {
+        onBindViewHolder(holder, (T)data,position);
         final Object o=data;
         if (null!=mOnItemClickListener) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mOnItemClickListener.onClickItem((T)o,holder.getAdapterPosition());
+                    mOnItemClickListener.onClickItem((T)o,holder.getAdapterPosition(),holder);
                 }
             });
         }
@@ -56,14 +56,13 @@ public abstract class AbstractSimpleAdapter<T> extends AbstractMultiTypeAdapter 
     }
 
     public interface  OnItemClickListener{
-        void onClickItem(Object o,int position);
+        void onClickItem(Object o,int position,ViewHolder viewHolder);
     }
 
 
 
     /**子类需实现以下方法*/
-
-    protected abstract void onBindViewHolder(ViewHolder holder,T data);
+    protected abstract void onBindViewHolder(ViewHolder holder,T data,int curPosition);
 
 
 

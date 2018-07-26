@@ -1,6 +1,7 @@
 package com.microsys.imbcloudlive.app;
 
 import android.app.Activity;
+import android.os.Environment;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
@@ -9,6 +10,7 @@ import com.microsys.imbcloudlive.di.component.AppComponent;
 import com.microsys.imbcloudlive.di.component.DaggerAppComponent;
 import com.microsys.imbcloudlive.di.module.AppModule;
 import com.microsys.imbcloudlive.di.module.NetModule;
+import com.microsys.imbcloudlive.utils.CrashHandler;
 import com.microsys.imbcloudlive.utils.ScreenUtils;
 
 import java.util.HashSet;
@@ -34,6 +36,8 @@ public class MyApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         INSTANCE=this;
+        CrashHandler crashHandler=CrashHandler.getsInstance();
+        crashHandler.init(INSTANCE, Environment.getExternalStorageDirectory()+"/iMbCloudLive/Log/");
 
         initComponent();
         initScreenInfos();

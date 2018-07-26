@@ -1,8 +1,10 @@
 package com.microsys.imbcloudlive.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.microsys.imbcloudlive.R;
 import com.microsys.imbcloudlive.base.BaseFragment;
@@ -11,9 +13,14 @@ import com.microsys.imbcloudlive.model.SimpleModel;
 import com.microsys.imbcloudlive.ui.adapters.AbstractSimpleAdapter;
 import com.microsys.imbcloudlive.ui.adapters.ViewHolder;
 import com.microsys.imbcloudlive.utils.DialogUtils;
+import com.microsys.imbcloudlive.utils.L;
+import com.tencent.rtmp.ITXLivePlayListener;
+import com.tencent.rtmp.TXLiveConstants;
+import com.tencent.rtmp.TXLivePlayConfig;
+import com.tencent.rtmp.TXLivePlayer;
+import com.tencent.rtmp.ui.TXCloudVideoView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 
@@ -30,8 +37,6 @@ public class HomeFragment extends BaseFragment {
     RecyclerView mRecyclerView;
     private ArrayList<SimpleModel> testList = new ArrayList<>();
     private AbstractSimpleAdapter<SimpleModel> mRecyclerAdapter;
-    private int number;
-    private List<Object> images = new ArrayList<>();
 
     @SuppressLint("ValidFragment")
     public HomeFragment(int i) {
@@ -50,11 +55,6 @@ public class HomeFragment extends BaseFragment {
     }
 
     @Override
-    public int getRootViewId() {
-        return R.layout.fragment_home;
-    }
-
-    @Override
     protected void setupActivityComponent(AppComponent appComponent) {
 
     }
@@ -62,9 +62,13 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void initViewAndData() {
         initList();
-        initBanner();
         initAdapter();
 
+    }
+
+    @Override
+    public int getRootViewId() {
+        return R.layout.fragment_home;
     }
 
     public void initList() {
@@ -77,16 +81,22 @@ public class HomeFragment extends BaseFragment {
         }
     }
 
-    private void initBanner() {
-        images.add(R.mipmap.banner01);
-        images.add(R.mipmap.banner02);
-        images.add(R.mipmap.banner03);
-    }
+    private TXLivePlayer mLivePlayer = null;
+    private TXLivePlayConfig mPlayConfig;
 
     private void initAdapter() {
+        mLivePlayer=new TXLivePlayer(mContext);
+        mPlayConfig = new TXLivePlayConfig();
+        mPlayConfig.setAutoAdjustCacheTime(true);
+        mPlayConfig.setMinAutoAdjustCacheTime(1);
+        mPlayConfig.setMaxAutoAdjustCacheTime(1);
         mRecyclerAdapter = new AbstractSimpleAdapter<SimpleModel>(mContext, testList, R.layout.item_add_views) {
             @Override
-            protected void onBindViewHolder(ViewHolder holder, SimpleModel data) {
+            protected void onBindViewHolder(ViewHolder holder, SimpleModel data, int curPostion) {
+                TextView tvNum =holder.getView(R.id.tvAddViewNums);
+                tvNum.setText(curPostion + "");
+
+
             }
         };
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(mContext, 2, RecyclerView.VERTICAL, false);
@@ -96,10 +106,29 @@ public class HomeFragment extends BaseFragment {
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerAdapter.setOnItemClickListener(new AbstractSimpleAdapter.OnItemClickListener() {
             @Override
-            public void onClickItem(Object o, int position) {
+            public void onClickItem(Object o, int position,ViewHolder holder) {
                 //设备性能无误的时候
                 if (true) {
-                    DialogUtils.showSelectableLiveStreamingDialog(mContext,true);
+                        TXCloudVideoView videoView=holder.<TXCloudVideoView>getView(R.id.txVideoView);
+                    mLivePlayer.setConfig(mPlayConfig);
+                    mLivePlayer.setPlayerView(videoView);
+                    mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
+                    mLivePlayer.setRenderRotation(TXLiveConstants.RENDER_ROTATION_PORTRAIT);
+                    mLivePlayer.enableHardwareDecode(false);
+                    mLivePlayer.setPlayListener(new ITXLivePlayListener() {
+                        @Override
+                        public void onPlayEvent(int i, Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onNetStatus(Bundle bundle) {
+
+                        }
+                    });
+                   int result= mLivePlayer.startPlay("rtmp://live.hkstv.hk.lxdns.com/live",TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
+                    L.e("play rtmp result code:"+result);
+//                    DialogUtils.showSelectableLiveStreamingDialog(mContext, true);
                 } else {
                     DialogUtils.twoButtonsDialog(mContext, "无法添加", getString(R.string.deviceNotSupport), "了解更多", "取消添加", true, new DialogUtils.MCallBack() {
                         @Override

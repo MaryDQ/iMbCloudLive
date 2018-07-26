@@ -29,7 +29,7 @@ public abstract class AbstractMultiTypeAdapter extends RecyclerView.Adapter<View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        onBindViewHolder(holder,getItemViewType(position),mDatas.get(position));
+        onBindViewHolder(holder,getItemViewType(position),mDatas.get(position),position);
     }
 
     @Override
@@ -51,6 +51,6 @@ public abstract class AbstractMultiTypeAdapter extends RecyclerView.Adapter<View
     @Override
     public abstract int getItemViewType(int position);
 
-    protected abstract void onBindViewHolder(ViewHolder holder,int type,Object data);
+    protected abstract void onBindViewHolder(ViewHolder holder,int type,Object data,int curPosition);
 
 }

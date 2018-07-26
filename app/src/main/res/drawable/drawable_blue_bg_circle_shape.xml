@@ -4,6 +4,8 @@
         <shape android:shape="oval">
             <corners android:radius="0dp"/>
             <solid android:color="@color/dialogButtonColor"/>
+            <padding android:bottom="2dp"/>
         </shape>
+
     </item>
 </selector>
