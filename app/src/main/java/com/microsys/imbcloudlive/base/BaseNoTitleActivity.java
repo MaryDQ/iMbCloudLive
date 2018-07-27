@@ -38,7 +38,6 @@ public abstract class BaseNoTitleActivity<P extends IPresenter> extends AppCompa
     protected Context mContext;
     @Inject
     protected P presenter;
-    //    private Map<Integer, RequestPermissionCallback> requestPermissionCallbackMap = new HashMap<>();
     private SparseArray<RequestPermissionCallback> requestPermissionCallbackMap = new SparseArray<>();
     private Unbinder unbinder;
     private ProgressDialog dialog;

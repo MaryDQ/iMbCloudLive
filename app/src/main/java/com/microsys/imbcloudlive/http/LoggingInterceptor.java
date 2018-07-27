@@ -117,7 +117,7 @@ public class LoggingInterceptor implements Interceptor{
      * Change the level at which this interceptor logs.
      */
     public LoggingInterceptor setLevel(Level level) {
-        if (level == null) throw new NullPointerException("level == null. Use Level.NONE instead.");
+        if (level == null) {throw new NullPointerException("level == null. Use Level.NONE instead.");}
         this.level = level;
         return this;
     }

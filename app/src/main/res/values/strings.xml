@@ -11,4 +11,11 @@
     <string name="newSth">新建</string>
     <string name="clickToInput">添加输入</string>
     <string name="clickToAddInputStreaming">点击添加输入源:0</string>
+    <string name="rtmpAddressExample">      rtmp://example.com/appName</string>
+    <string name="streamName">     streamName</string>
+    <string name="cancel">取消</string>
+    <string name="rename">重命名</string>
+    <string name="rtmpDescribe">RTMP 串流码</string>
+    <string name="rtmpServerAddress">RTMP 流服务器地址</string>
+    <string name="rtmpPullNameHint">新 RTMP 拉流地址</string>
 </resources>

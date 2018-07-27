@@ -9,4 +9,6 @@
     <color name="fontBrown">#635e58</color>
     <color name="dialogButtonColor">#45c2fa</color>
     <color name="dialogLineColor">#d5d5d5</color>
+    <color name="deepBlue">#183ec9</color>
+    <color name="littleGray">#F2F2F0</color>
 </resources>

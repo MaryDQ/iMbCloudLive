@@ -116,8 +116,6 @@ public class HomeFragment extends BaseFragment {
                 player.enableHardwareDecode(false);
                 //设备性能无误的时候
                 if (true) {
-
-
                     DialogUtils.showSelectableLiveStreamingDialog(mContext, true, new DialogUtils.MCallBack() {
                         @Override
                         public boolean OnCallBackDispath(Boolean bSucceed, String clickText) {
