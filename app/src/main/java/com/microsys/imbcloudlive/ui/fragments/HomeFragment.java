@@ -1,9 +1,9 @@
 package com.microsys.imbcloudlive.ui.fragments;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.TextView;
 
 import com.microsys.imbcloudlive.R;
@@ -13,14 +13,13 @@ import com.microsys.imbcloudlive.model.SimpleModel;
 import com.microsys.imbcloudlive.ui.adapters.AbstractSimpleAdapter;
 import com.microsys.imbcloudlive.ui.adapters.ViewHolder;
 import com.microsys.imbcloudlive.utils.DialogUtils;
-import com.microsys.imbcloudlive.utils.L;
-import com.tencent.rtmp.ITXLivePlayListener;
 import com.tencent.rtmp.TXLiveConstants;
 import com.tencent.rtmp.TXLivePlayConfig;
 import com.tencent.rtmp.TXLivePlayer;
 import com.tencent.rtmp.ui.TXCloudVideoView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
@@ -37,6 +36,14 @@ public class HomeFragment extends BaseFragment {
     RecyclerView mRecyclerView;
     private ArrayList<SimpleModel> testList = new ArrayList<>();
     private AbstractSimpleAdapter<SimpleModel> mRecyclerAdapter;
+    /**
+     * TXPlayer播放配置
+     */
+    private TXLivePlayConfig mPlayConfig;
+    /**
+     * List中的TxLivePlayer对象集合,用来控制界面隐藏和重新进入的播放或者暂停
+     */
+    private List<TXLivePlayer> listTxLivePlayer = new ArrayList<>();
 
     @SuppressLint("ValidFragment")
     public HomeFragment(int i) {
@@ -63,7 +70,7 @@ public class HomeFragment extends BaseFragment {
     public void initViewAndData() {
         initList();
         initAdapter();
-
+        initTXPlayConfig();
     }
 
     @Override
@@ -72,32 +79,23 @@ public class HomeFragment extends BaseFragment {
     }
 
     public void initList() {
-        SimpleModel simpleModel = new SimpleModel();
-        simpleModel.setContent("nihao");
-        simpleModel.setPicUrl("http://g.hiphotos.baidu.com/image/pic/item/4610b912c8fcc3cec52444bf9e45d688d53f2051.jpg");
+
         testList.clear();
         for (int i = 0; i < 16; i++) {
+            SimpleModel simpleModel = new SimpleModel();
+            TXLivePlayer player = new TXLivePlayer(mContext);
+            simpleModel.setTxLivePlayer(player);
             testList.add(simpleModel);
         }
     }
 
-    private TXLivePlayer mLivePlayer = null;
-    private TXLivePlayConfig mPlayConfig;
-
-
     private void initAdapter() {
-        mLivePlayer=new TXLivePlayer(mContext);
-        mPlayConfig = new TXLivePlayConfig();
-        mPlayConfig.setAutoAdjustCacheTime(true);
-        mPlayConfig.setMinAutoAdjustCacheTime(1);
-        mPlayConfig.setMaxAutoAdjustCacheTime(1);
+
         mRecyclerAdapter = new AbstractSimpleAdapter<SimpleModel>(mContext, testList, R.layout.item_add_views) {
             @Override
             protected void onBindViewHolder(ViewHolder holder, SimpleModel data, int curPostion) {
-                TextView tvNum =holder.getView(R.id.tvAddViewNums);
+                TextView tvNum = holder.getView(R.id.tvAddViewNums);
                 tvNum.setText(curPostion + "");
-
-
             }
         };
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(mContext, 2, RecyclerView.VERTICAL, false);
@@ -107,29 +105,32 @@ public class HomeFragment extends BaseFragment {
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerAdapter.setOnItemClickListener(new AbstractSimpleAdapter.OnItemClickListener() {
             @Override
-            public void onClickItem(Object o, int position,ViewHolder holder) {
+            public void onClickItem(Object o, int position, ViewHolder holder) {
+                final TXCloudVideoView videoView = holder.getView(R.id.txVideoView);
+                final TextView tvClickToAdd = holder.getView(R.id.tvAddViewClickToAdd);
+                final TXLivePlayer player = ((SimpleModel) o).getTxLivePlayer();
+                player.setConfig(mPlayConfig);
+                player.setPlayerView(videoView);
+                player.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
+                player.setRenderRotation(TXLiveConstants.RENDER_ROTATION_PORTRAIT);
+                player.enableHardwareDecode(false);
                 //设备性能无误的时候
                 if (true) {
-                        TXCloudVideoView videoView=holder.<TXCloudVideoView>getView(R.id.txVideoView);
-                    mLivePlayer.setConfig(mPlayConfig);
-                    mLivePlayer.setPlayerView(videoView);
-                    mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
-                    mLivePlayer.setRenderRotation(TXLiveConstants.RENDER_ROTATION_PORTRAIT);
-                    mLivePlayer.enableHardwareDecode(false);
-                    mLivePlayer.setPlayListener(new ITXLivePlayListener() {
+
+
+                    DialogUtils.showSelectableLiveStreamingDialog(mContext, true, new DialogUtils.MCallBack() {
                         @Override
-                        public void onPlayEvent(int i, Bundle bundle) {
-
-                        }
-
-                        @Override
-                        public void onNetStatus(Bundle bundle) {
-
+                        public boolean OnCallBackDispath(Boolean bSucceed, String clickText) {
+                            if (bSucceed) {
+                                int result = player.startPlay(clickText, TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
+                                if (result == 0) {
+                                    tvClickToAdd.setVisibility(View.GONE);
+                                    listTxLivePlayer.add(player);
+                                }
+                            }
+                            return false;
                         }
                     });
-                   int result= mLivePlayer.startPlay("rtmp://live.hkstv.hk.lxdns.com/live",TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
-                    L.e("play rtmp result code:"+result);
-//                    DialogUtils.showSelectableLiveStreamingDialog(mContext, true);
                 } else {
                     DialogUtils.twoButtonsDialog(mContext, "无法添加", getString(R.string.deviceNotSupport), "了解更多", "取消添加", true, new DialogUtils.MCallBack() {
                         @Override
@@ -148,14 +149,40 @@ public class HomeFragment extends BaseFragment {
 
     }
 
+    private void initTXPlayConfig() {
+        mPlayConfig = new TXLivePlayConfig();
+        mPlayConfig.setAutoAdjustCacheTime(true);
+        mPlayConfig.setMinAutoAdjustCacheTime(1);
+        mPlayConfig.setMaxAutoAdjustCacheTime(1);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
     }
 
     @Override
+    public void onResume() {
+
+        super.onResume();
+        for (TXLivePlayer player :
+                listTxLivePlayer) {
+            if (player != null && !player.isPlaying()) {
+                player.resume();
+            }
+        }
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+        for (TXLivePlayer player :
+                listTxLivePlayer) {
+            if (player != null && player.isPlaying()) {
+                player.pause();
+            }
+        }
     }
+
 
 }

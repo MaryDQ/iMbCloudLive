@@ -1,18 +1,5 @@
 package com.microsys.imbcloudlive.ui.activitys;
 
-import android.Manifest;
-import android.app.KeyguardManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.CancellationSignal;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.microsys.imbcloudlive.R;
 import com.microsys.imbcloudlive.base.BaseNoTitleActivity;
 import com.microsys.imbcloudlive.di.component.AppComponent;
@@ -31,9 +18,9 @@ import butterknife.BindView;
 public class TestActivity extends BaseNoTitleActivity {
 
     private TXLivePlayer mLivePlayer = null;
-    private TXLivePlayConfig mPlayConfig;
     @BindView(R.id.txVideoViewTest)
     TXCloudVideoView mTXCloudVideoView;
+    private TXLivePlayConfig mPlayConfig;
 
     @Override
     public int getRootViewId() {
@@ -48,16 +35,15 @@ public class TestActivity extends BaseNoTitleActivity {
     @Override
     public void initViewAndData() {
         mLivePlayer=new TXLivePlayer(mContext);
+        mLivePlayer.setPlayerView(mTXCloudVideoView);
         mPlayConfig = new TXLivePlayConfig();
         mPlayConfig.setAutoAdjustCacheTime(true);
         mPlayConfig.setMinAutoAdjustCacheTime(1);
         mPlayConfig.setMaxAutoAdjustCacheTime(1);
-        mLivePlayer.setConfig(mPlayConfig);
-        mLivePlayer.setPlayerView(mTXCloudVideoView);
-        mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
+        mLivePlayer.setRenderMode(TXLiveConstants.RENDER_MODE_ADJUST_RESOLUTION);
         mLivePlayer.setRenderRotation(TXLiveConstants.RENDER_ROTATION_PORTRAIT);
         mLivePlayer.enableHardwareDecode(false);
-        mLivePlayer.startPlay("rtmp://live.hkstv.hk.lxdns.com/live",TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
+        mLivePlayer.startPlay("rtmp://live.hkstv.hk.lxdns.com/live/hks",TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
 
     }
 

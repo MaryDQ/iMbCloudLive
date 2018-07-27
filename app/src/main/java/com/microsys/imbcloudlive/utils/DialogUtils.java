@@ -2,6 +2,9 @@ package com.microsys.imbcloudlive.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -10,6 +13,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.microsys.imbcloudlive.R;
+import com.microsys.imbcloudlive.ui.adapters.AbstractSimpleAdapter;
+import com.microsys.imbcloudlive.ui.adapters.ViewHolder;
+
+import java.util.ArrayList;
 
 /**
  * 描述：Dialog工具类
@@ -71,7 +78,7 @@ public class DialogUtils {
         });
     }
 
-    public static void showSelectableLiveStreamingDialog(Context context, boolean cancelable) {
+    public static void showSelectableLiveStreamingDialog(Context context, boolean cancelable, final MCallBack mCallBack) {
         final AlertDialog alertDialog = new AlertDialog.Builder(context, R.style.dialog_default_style).create();
         alertDialog.setCancelable(cancelable);
         alertDialog.setView(new EditText(context));
@@ -85,6 +92,33 @@ public class DialogUtils {
         params.gravity= Gravity.BOTTOM;
         window.setAttributes(params);
         window.setContentView(R.layout.dialog_selectable_live_streaming);
+        RecyclerView rcvDialogSelectableLiveStreaming=window.findViewById(R.id.rcvDialogSelectableLiveStreaming);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(context);
+        ArrayList<Integer> list=new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        AbstractSimpleAdapter<Integer> adapter=new AbstractSimpleAdapter<Integer>(context, list,R.layout.item_single_rtmp) {
+            @Override
+            protected void onBindViewHolder(ViewHolder holder, Integer data, int curPosition) {
+                TextView tvStreamingName=holder.getView(R.id.tvStreamingName);
+                TextView tvStreamingType=holder.getView(R.id.tvStreamingType);
+                TextView tvStreamingPlayAddress=holder.getView(R.id.tvStreamingPlayAddress);
+                tvStreamingName.setText("香港卫视");
+                tvStreamingType.setText("RTSP 格式");
+                tvStreamingPlayAddress.setText("rtmp://live.hkstv.hk.lxdns.com/live/hks");
+            }
+        };
+        rcvDialogSelectableLiveStreaming.setLayoutManager(layoutManager);
+        rcvDialogSelectableLiveStreaming.setAdapter(adapter);
+        rcvDialogSelectableLiveStreaming.addItemDecoration(new DividerItemDecoration(context,RecyclerView.VERTICAL));
+        adapter.setOnItemClickListener(new AbstractSimpleAdapter.OnItemClickListener() {
+            @Override
+            public void onClickItem(Object o, int position, ViewHolder viewHolder) {
+                mCallBack.OnCallBackDispath(true,"rtmp://live.hkstv.hk.lxdns.com/live/hks");
+                alertDialog.dismiss();
+            }
+        });
 
     }
 

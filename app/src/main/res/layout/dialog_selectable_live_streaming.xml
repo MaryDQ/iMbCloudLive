@@ -74,9 +74,14 @@
         android:text="@string/newSth"
         android:textColor="@drawable/btn_dialog_live_streaming_color"
         android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rcvDialogSelectableLiveStreaming" />
+
+    <View
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnNewSth"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"/>
 
 
 </android.support.constraint.ConstraintLayout>

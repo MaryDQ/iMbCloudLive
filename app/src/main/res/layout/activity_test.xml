@@ -9,7 +9,10 @@
     <com.tencent.rtmp.ui.TXCloudVideoView
         android:id="@+id/txVideoViewTest"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="200dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
     </com.tencent.rtmp.ui.TXCloudVideoView>
 
