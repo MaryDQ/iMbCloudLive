@@ -18,4 +18,13 @@
     <string name="rtmpDescribe">RTMP 串流码</string>
     <string name="rtmpServerAddress">RTMP 流服务器地址</string>
     <string name="rtmpPullNameHint">新 RTMP 拉流地址</string>
+    <string name="inputManager">输入管理</string>
+    <string name="zeroPercent">0%</string>
+    <string name="hundredPercent">100%</string>
+    <string name="remove">移除</string>
+    <string name="mute">静音</string>
+    <string name="voice">音量</string>
+    <string name="playing">播出</string>
+    <string name="previewing">预监</string>
+    <string name="videoFromZero">视频源 0</string>
 </resources>

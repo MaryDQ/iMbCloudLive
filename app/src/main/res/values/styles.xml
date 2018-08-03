@@ -41,4 +41,11 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <style name="LibraryVideoMediaControllerSeekBar" parent="android:Widget.SeekBar">
+        <item name="android:progressDrawable">@drawable/library_video_layer_sbar_bg</item>
+        <item name="android:minHeight">3dp</item>
+        <item name="android:maxHeight">3dp</item>
+        <item name="android:thumb">@drawable/library_video_selector_sbar_thumb</item>
+    </style>
+
 </resources>

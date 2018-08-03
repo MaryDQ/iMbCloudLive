@@ -5,6 +5,8 @@
             <corners android:radius="0dp"/>
             <solid android:color="@color/dialogButtonColor"/>
             <padding android:bottom="2dp"/>
+            <size android:height="20dp"
+                android:width="20dp"/>
         </shape>
 
     </item>

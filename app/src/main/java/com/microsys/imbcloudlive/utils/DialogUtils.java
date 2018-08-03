@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.microsys.imbcloudlive.R;
@@ -136,6 +137,13 @@ public class DialogUtils {
 
     }
 
+    /**
+     * 添加输入流Dialog
+     *
+     * @param context    上下文
+     * @param cancelable 点击外部是否可取消
+     * @param mCallBack  点击确定或者取消的回调
+     */
     public static void showEditSingleStreamDialog(Context context, boolean cancelable, MCallBack mCallBack) {
         final AlertDialog alertDialog = new AlertDialog.Builder(context, R.style.dialog_default_style).create();
         alertDialog.setCancelable(cancelable);
@@ -155,6 +163,64 @@ public class DialogUtils {
         EditText etRtmpServerAddress = window.findViewById(R.id.etRtmpServerAddress);
         etRtmpServerAddress.requestFocus();
     }
+
+    public static void showStreamInputManagerDialog(Context context, boolean cancelable, final MCallBack mCallBack) {
+        final AlertDialog alertDialog = new AlertDialog.Builder(context, R.style.dialog_default_style).create();
+        alertDialog.setCancelable(cancelable);
+        alertDialog.setView(new EditText(context));
+        alertDialog.show();
+        Window window = alertDialog.getWindow();
+        if (window == null) {
+            throw new IllegalArgumentException("获取window为空");
+        }
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.gravity = Gravity.BOTTOM;
+        window.setAttributes(params);
+        window.setContentView(R.layout.dialog_stream_input_manager);
+        SeekBar mSeekBarDialogStreamInputManager = window.findViewById(R.id.seekBarDialogStreamInputManager);
+        final TextView mTvCurProgress = window.findViewById(R.id.tvCurProgress);
+        final TextView mTvMute = window.findViewById(R.id.tvMute);
+        final TextView mTvRemove = window.findViewById(R.id.tvRemove);
+
+
+        mSeekBarDialogStreamInputManager.setProgress(50);
+        mTvCurProgress.setText(50 + "%");
+
+        mSeekBarDialogStreamInputManager.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mTvCurProgress.setText(i + "%");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mTvRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallBack.OnCallBackDispath(false, "移除");
+                alertDialog.dismiss();
+            }
+        });
+
+        mTvMute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallBack.OnCallBackDispath(true, "静音");
+            }
+        });
+
+    }
+
 
     public interface MCallBack {
         /**

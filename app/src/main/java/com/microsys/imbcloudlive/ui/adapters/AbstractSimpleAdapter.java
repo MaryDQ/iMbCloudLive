@@ -46,10 +46,20 @@ public abstract class AbstractSimpleAdapter<T> extends AbstractMultiTypeAdapter 
                 }
             });
         }
+        if (null!=mOnItemLongClickListener) {
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    mOnItemLongClickListener.onLongClickItem((T)o,holder.getAdapterPosition(),holder);
+                    return false;
+                }
+            });
+        }
 
     }
 
     private OnItemClickListener mOnItemClickListener;
+    private OnItemLongClickListener mOnItemLongClickListener;
 
     public void setOnItemClickListener(OnItemClickListener listener){
         this.mOnItemClickListener=listener;
@@ -57,6 +67,14 @@ public abstract class AbstractSimpleAdapter<T> extends AbstractMultiTypeAdapter 
 
     public interface  OnItemClickListener{
         void onClickItem(Object o,int position,ViewHolder viewHolder);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener){
+        this.mOnItemLongClickListener =listener;
+    }
+
+    public interface OnItemLongClickListener{
+        void onLongClickItem(Object o,int position,ViewHolder viewHolder);
     }
 
 

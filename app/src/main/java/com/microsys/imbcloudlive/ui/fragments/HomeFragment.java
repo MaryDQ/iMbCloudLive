@@ -1,6 +1,7 @@
 package com.microsys.imbcloudlive.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -141,6 +142,32 @@ public class HomeFragment extends BaseFragment {
                     });
 
                 }
+            }
+        });
+
+        mRecyclerAdapter.setOnItemLongClickListener(new AbstractSimpleAdapter.OnItemLongClickListener() {
+            @Override
+            public void onLongClickItem(Object o, int position, ViewHolder viewHolder) {
+               final TXLivePlayer curSelectedPlayer=((SimpleModel)o).getTxLivePlayer();
+               final TXCloudVideoView curVideoView=viewHolder.getView(R.id.txVideoView);
+                final TextView tvClickToAdd = viewHolder.getView(R.id.tvAddViewClickToAdd);
+                DialogUtils.showStreamInputManagerDialog(mContext, true, new DialogUtils.MCallBack() {
+                    @Override
+                    public boolean OnCallBackDispath(Boolean bSucceed, String clickText) {
+                        //静音
+                        if (bSucceed) {
+
+                        }//移除
+                        else {
+                            curSelectedPlayer.stopPlay(true);
+                            curVideoView.setVisibility(View.GONE);
+                            curVideoView.setBackgroundColor(Color.BLACK);
+                            tvClickToAdd.setVisibility(View.VISIBLE);
+                            listTxLivePlayer.remove(curSelectedPlayer);
+                        }
+                        return false;
+                    }
+                });
             }
         });
 
