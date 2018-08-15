@@ -11,6 +11,7 @@ import com.microsys.imbcloudlive.di.component.AppComponent;
 import com.microsys.imbcloudlive.ui.adapters.RecyclerTabLyoutAdapter;
 import com.microsys.imbcloudlive.ui.adapters.RecyclerViewPagerAdapter;
 import com.microsys.imbcloudlive.ui.fragments.HomeFragment;
+import com.microsys.imbcloudlive.ui.fragments.SelectScreenFragment;
 import com.microsys.imbcloudlive.widget.RecyclerTabLayout;
 
 import java.util.ArrayList;
@@ -56,8 +57,11 @@ public class HomeActivity extends BaseNoTitleActivity {
 
     private void initFragment() {
         HomeFragment mHomeFragment;
-        for (int i = 0; i < CONTENT.length; i++) {
-            mHomeFragment = new HomeFragment(0);
+        SelectScreenFragment mSelectScreenFragment=new SelectScreenFragment(0);
+        mSelectScreenFragment.setTabPos(0);
+        fragments.add(0,mSelectScreenFragment);
+        for (int i = 1; i < CONTENT.length; i++) {
+            mHomeFragment = new HomeFragment(1);
             mHomeFragment.setTabPos(i);
             fragments.add(i, mHomeFragment);
         }
@@ -80,8 +84,11 @@ public class HomeActivity extends BaseNoTitleActivity {
             @Override
             public void onPageSelected(int position) {
                 // TODO: 2018/7/25 可能需要有多个fragment进行判断
-                HomeFragment homeFragment = (HomeFragment) fragments.get(position);
-                homeFragment.sendMessage();
+                if (position>0) {
+                    HomeFragment homeFragment = (HomeFragment) fragments.get(position);
+                    homeFragment.sendMessage();
+                }
+
             }
 
             @Override
