@@ -1,7 +1,8 @@
 package com.microsys.imbcloudlive.model;
 
 public class ScreenTypeModel {
-    private String screenType;
+    private int screenType;
+    private String screenTypeName;
     private int imageId;
 
     public int getImageId() {
@@ -12,11 +13,19 @@ public class ScreenTypeModel {
         this.imageId = imageId;
     }
 
-    public String getScreenType() {
-        return screenType == null ? "" : screenType;
+    public int getScreenType() {
+        return screenType;
     }
 
-    public void setScreenType(String screenType) {
+    public void setScreenType(int screenType) {
         this.screenType = screenType;
+    }
+
+    public String getScreenTypeName() {
+        return screenTypeName == null ? "" : screenTypeName;
+    }
+
+    public void setScreenTypeName(String screenTypeName) {
+        this.screenTypeName = screenTypeName;
     }
 }

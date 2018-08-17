@@ -9,9 +9,12 @@ import android.widget.TextView;
 import com.microsys.imbcloudlive.R;
 import com.microsys.imbcloudlive.base.BaseFragment;
 import com.microsys.imbcloudlive.di.component.AppComponent;
+import com.microsys.imbcloudlive.eventbus_events.SwitchScreenTypeEvent;
 import com.microsys.imbcloudlive.model.ScreenTypeModel;
 import com.microsys.imbcloudlive.ui.adapters.AbstractSimpleAdapter;
 import com.microsys.imbcloudlive.ui.adapters.ViewHolder;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -54,49 +57,118 @@ public class SelectScreenFragment extends BaseFragment {
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(100);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.double_split_screen);
-        model.setScreenType("双分屏");
+        model.setScreenTypeName("双分屏");
+        model.setScreenType(201);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.pip_left_upper);
-        model.setScreenType("画中画-左上");
+        model.setScreenTypeName("画中画-左上");
+        model.setScreenType(202);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(203);
+        mList.add(model);
+
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(204);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(205);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(301);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(302);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(303);
         mList.add(model);
 
         model = new ScreenTypeModel();
         model.setImageId(R.mipmap.single);
-        model.setScreenType("单分屏");
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(304);
         mList.add(model);
 
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(305);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(401);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(402);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(403);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(500);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(600);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(001);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(002);
+        mList.add(model);
+
+        model = new ScreenTypeModel();
+        model.setImageId(R.mipmap.single);
+        model.setScreenTypeName("单分屏");
+        model.setScreenType(003);
+        mList.add(model);
 
     }
 
@@ -107,12 +179,18 @@ public class SelectScreenFragment extends BaseFragment {
                 ImageView ivScreenType = holder.getView(R.id.ivScreenType);
                 TextView tvScreenType = holder.getView(R.id.tvScreenType);
                 ivScreenType.setImageResource(data.getImageId());
-                tvScreenType.setText(data.getScreenType());
+                tvScreenType.setText(data.getScreenTypeName());
             }
         };
         GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
         mRcvSelectScreen.setLayoutManager(layoutManager);
         mRcvSelectScreen.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(new AbstractSimpleAdapter.OnItemClickListener() {
+            @Override
+            public void onClickItem(Object o, int position, ViewHolder viewHolder) {
+                EventBus.getDefault().post(new SwitchScreenTypeEvent(((ScreenTypeModel) o).getScreenType(), true));
+            }
+        });
     }
 
     @Override

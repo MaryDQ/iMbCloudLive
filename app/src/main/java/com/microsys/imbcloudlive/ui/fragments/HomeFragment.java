@@ -9,7 +9,10 @@ import android.widget.TextView;
 
 import com.microsys.imbcloudlive.R;
 import com.microsys.imbcloudlive.base.BaseFragment;
+import com.microsys.imbcloudlive.common.Constants;
 import com.microsys.imbcloudlive.di.component.AppComponent;
+import com.microsys.imbcloudlive.eventbus_events.TransformCurPlayModelEvent;
+import com.microsys.imbcloudlive.model.ListTxPlayerModel;
 import com.microsys.imbcloudlive.model.SimpleModel;
 import com.microsys.imbcloudlive.ui.adapters.AbstractSimpleAdapter;
 import com.microsys.imbcloudlive.ui.adapters.ViewHolder;
@@ -18,6 +21,8 @@ import com.tencent.rtmp.TXLiveConstants;
 import com.tencent.rtmp.TXLivePlayConfig;
 import com.tencent.rtmp.TXLivePlayer;
 import com.tencent.rtmp.ui.TXCloudVideoView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +49,7 @@ public class HomeFragment extends BaseFragment {
     /**
      * List中的TxLivePlayer对象集合,用来控制界面隐藏和重新进入的播放或者暂停
      */
-    private List<TXLivePlayer> listTxLivePlayer = new ArrayList<>();
+    private List<ListTxPlayerModel> listTxLivePlayer = new ArrayList<>();
 
     @SuppressLint("ValidFragment")
     public HomeFragment(int i) {
@@ -82,9 +87,9 @@ public class HomeFragment extends BaseFragment {
     public void initList() {
 
         testList.clear();
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 6; i++) {
             SimpleModel simpleModel = new SimpleModel();
-            TXLivePlayer player = new TXLivePlayer(mContext);
+            TXLivePlayer player =null;
             simpleModel.setTxLivePlayer(player);
             testList.add(simpleModel);
         }
@@ -107,9 +112,13 @@ public class HomeFragment extends BaseFragment {
         mRecyclerAdapter.setOnItemClickListener(new AbstractSimpleAdapter.OnItemClickListener() {
             @Override
             public void onClickItem(Object o, int position, ViewHolder holder) {
+                final int curPosition=position;
                 final TXCloudVideoView videoView = holder.getView(R.id.txVideoView);
                 final TextView tvClickToAdd = holder.getView(R.id.tvAddViewClickToAdd);
-                final TXLivePlayer player = ((SimpleModel) o).getTxLivePlayer();
+                TXLivePlayer player = ((SimpleModel) o).getTxLivePlayer();
+                if (null==player) {
+                    player=new TXLivePlayer(mContext);
+                }
                 player.setConfig(mPlayConfig);
                 player.setPlayerView(videoView);
                 player.setRenderMode(TXLiveConstants.RENDER_MODE_FULL_FILL_SCREEN);
@@ -117,14 +126,38 @@ public class HomeFragment extends BaseFragment {
                 player.enableHardwareDecode(false);
                 //设备性能无误的时候
                 if (true) {
+                    final TXLivePlayer finalPlayer = player;
                     DialogUtils.showSelectableLiveStreamingDialog(mContext, true, new DialogUtils.MCallBack() {
                         @Override
                         public boolean OnCallBackDispath(Boolean bSucceed, String clickText) {
                             if (bSucceed) {
-                                int result = player.startPlay(clickText, TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
+                                int result = finalPlayer.startPlay(clickText, TXLivePlayer.PLAY_TYPE_LIVE_RTMP);
                                 if (result == 0) {
+                                    boolean doNext=true;
+                                    for (int i = 0; i < listTxLivePlayer.size(); i++) {
+                                        ListTxPlayerModel playerModel=listTxLivePlayer.get(i);
+                                        if (curPosition==playerModel.getPosition()) {
+                                            doNext=false;
+                                            break;
+                                        }
+                                    }
+                                    if (!doNext) {
+                                        return false;
+                                    }
+
+                                    ListTxPlayerModel model=new ListTxPlayerModel();
+                                    model.setPosition(curPosition);
+                                    model.setPlayUrl(clickText);
+                                    model.setTxLivePlayer(finalPlayer);
                                     tvClickToAdd.setVisibility(View.GONE);
-                                    listTxLivePlayer.add(player);
+                                    listTxLivePlayer.add(model);
+
+                                    ListTxPlayerModel modelTemp=new ListTxPlayerModel();
+                                    modelTemp.setPosition(curPosition);
+                                    modelTemp.setPlayUrl(clickText);
+                                    modelTemp.setTxLivePlayer(null);
+                                    Constants.curFragListTxPlayerModel.add(modelTemp);
+                                    EventBus.getDefault().post(new TransformCurPlayModelEvent(true));
                                 }
                             }
                             return false;
@@ -148,8 +181,9 @@ public class HomeFragment extends BaseFragment {
         mRecyclerAdapter.setOnItemLongClickListener(new AbstractSimpleAdapter.OnItemLongClickListener() {
             @Override
             public void onLongClickItem(Object o, int position, ViewHolder viewHolder) {
-               final TXLivePlayer curSelectedPlayer=((SimpleModel)o).getTxLivePlayer();
-               final TXCloudVideoView curVideoView=viewHolder.getView(R.id.txVideoView);
+                final int curPosition=position;
+                final TXLivePlayer[] curSelectedPlayer = {((SimpleModel) o).getTxLivePlayer()};
+                final TXCloudVideoView[] curVideoView = {viewHolder.getView(R.id.txVideoView)};
                 final TextView tvClickToAdd = viewHolder.getView(R.id.tvAddViewClickToAdd);
                 DialogUtils.showStreamInputManagerDialog(mContext, true, new DialogUtils.MCallBack() {
                     @Override
@@ -159,11 +193,33 @@ public class HomeFragment extends BaseFragment {
 
                         }//移除
                         else {
-                            curSelectedPlayer.stopPlay(true);
-                            curVideoView.setVisibility(View.GONE);
-                            curVideoView.setBackgroundColor(Color.BLACK);
-                            tvClickToAdd.setVisibility(View.VISIBLE);
-                            listTxLivePlayer.remove(curSelectedPlayer);
+
+                            for (int i = 0; i < listTxLivePlayer.size(); i++) {
+                                ListTxPlayerModel model=listTxLivePlayer.get(i);
+                                if (model.getPosition()==curPosition) {
+                                    TXLivePlayer player=model.getTxLivePlayer();
+                                    player.stopPlay(true);
+                                    player=null;
+
+                                    curVideoView[0].setVisibility(View.GONE);
+                                    curVideoView[0].setBackgroundColor(Color.BLACK);
+                                    curVideoView[0].onDestroy();
+                                    curVideoView[0] =null;
+                                    tvClickToAdd.setVisibility(View.VISIBLE);
+
+                                    listTxLivePlayer.remove(model);
+                                    break;
+                                }
+                            }
+
+                            for (int i = 0; i < Constants.curFragListTxPlayerModel.size(); i++) {
+                                ListTxPlayerModel model=Constants.curFragListTxPlayerModel.get(i);
+                                if (model.getPosition()==curPosition) {
+                                    Constants.curFragListTxPlayerModel.remove(model);
+                                    EventBus.getDefault().post(new TransformCurPlayModelEvent(true));
+                                    break;
+                                }
+                            }
                         }
                         return false;
                     }
@@ -190,8 +246,9 @@ public class HomeFragment extends BaseFragment {
     public void onResume() {
 
         super.onResume();
-        for (TXLivePlayer player :
+        for (ListTxPlayerModel model :
                 listTxLivePlayer) {
+            TXLivePlayer player=model.getTxLivePlayer();
             if (player != null && !player.isPlaying()) {
                 player.resume();
             }
@@ -201,13 +258,25 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onPause() {
         super.onPause();
-        for (TXLivePlayer player :
+        for (ListTxPlayerModel model :
                 listTxLivePlayer) {
+            TXLivePlayer player=model.getTxLivePlayer();
             if (player != null && player.isPlaying()) {
                 player.pause();
             }
         }
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for (ListTxPlayerModel model :
+                listTxLivePlayer) {
+            TXLivePlayer player=model.getTxLivePlayer();
+            if (player!=null) {
+                player.stopPlay(true);
+                player=null;
+            }
+        }
+    }
 }

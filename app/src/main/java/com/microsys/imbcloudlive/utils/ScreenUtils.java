@@ -11,7 +11,16 @@ public class ScreenUtils {
     private int screenHeight;
     private float xdpi, ydpi;
 
-    public ScreenUtils() {
+    private ScreenUtils() {
+
+    }
+
+    public void init() {
+        DisplayMetrics dm = MyApplication.getInstance().getResources().getDisplayMetrics();
+        screenWidth = dm.widthPixels;
+        screenHeight = dm.heightPixels;
+        xdpi = dm.xdpi;
+        ydpi = dm.ydpi;
     }
 
     public static ScreenUtils getInstance() {
@@ -23,14 +32,6 @@ public class ScreenUtils {
             }
         }
         return mScreenUtils;
-    }
-
-    public void init() {
-        DisplayMetrics dm = MyApplication.getInstance().getResources().getDisplayMetrics();
-        screenWidth = dm.widthPixels;
-        screenHeight = dm.heightPixels;
-        xdpi = dm.xdpi;
-        ydpi = dm.ydpi;
     }
 
     public int getScreenWidth() {
